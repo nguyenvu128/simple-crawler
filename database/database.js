@@ -8,6 +8,7 @@ module.exports = (callback) => {
             console.log(err);
             //throw err;
         } else {
+            console.log('Connect to database successfully');
             callback();
         }
     });
