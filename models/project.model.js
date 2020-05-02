@@ -1,11 +1,13 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const ObjectId = mongoose.Schema.Types.ObjectId;
-const projectchema = new Schema ({
+const projectSchema = new Schema ({
     name: String,
     address: String,
     introduce: String,
-    image: []
+    image: [String],
+    slug:String
 }, {timestamps: true});
-const Project = new mongoose.model('Project', projectchema);
+const Project = new mongoose.model('Project', projectSchema);
+
 module.exports = Project;
