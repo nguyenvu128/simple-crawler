@@ -24,11 +24,17 @@ const detailCrawler = new Crawler({
                 return ele.attribs.src;
             }).get();
 
+            // const gallery = $('').map((index, ele) => {
+            //     console.log(ele)
+            //     return ele.attribs.src;
+            // }).get();
+
             const project = new ProjectModel({
                 name: projectName,
                 address: address,
                 introduce: introduce,
                 image: image,
+                //gallery: gallery,
                 slug: projectSlug
             });
             console.log(projectName);
@@ -78,5 +84,4 @@ module.exports = () => {
     for(let i = 1; i<=10; i++) {
         listCrawler.queue(pagePatern + i);
     }
-    //detailCrawler.queue('https://batdongsan.com.vn/can-ho-chung-cu-dong-da/chung-cu-green-building-pj4886');
 }

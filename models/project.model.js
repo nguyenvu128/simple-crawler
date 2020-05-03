@@ -6,6 +6,7 @@ const projectSchema = new Schema ({
     address: String,
     introduce: String,
     image: [String],
+    //gallery: [String],
     slug:String
 }, {timestamps: true});
 const Project = new mongoose.model('Project', projectSchema);
