@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const ObjectId = mongoose.Schema.Types.ObjectId;
-const housesForRentSchema = new Schema({
+const postSchema = new Schema({
     title: String,
     price: String,
     area: String,
@@ -21,5 +21,5 @@ const housesForRentSchema = new Schema({
     slug: String
 }, {timestamps: true});
 
-const HouseForRent = new mongoose.model('HouseForRent', housesForRentSchema);
-module.exports = HouseForRent;
+const Post = new mongoose.model('Post', postSchema);
+module.exports = Post;

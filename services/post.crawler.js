@@ -1,5 +1,5 @@
 const Crawler = require('crawler');
-const HouseForRentModel = require('../models/houses-for-rent.model');
+const PostModel = require('../models/post.model');
 const slug = require('slug');
 
 const detailCrawler = new Crawler({
@@ -26,13 +26,13 @@ const detailCrawler = new Crawler({
             const toilets = $('#LeftMainContent__productDetail_toilet .right').text();
             const contactName = $('.divContactName').text();
             const contactAddress = $('#LeftMainContent__productDetail_contactAddress .right').text();
-            const contactEmail = $('#contactEmail > div.right.contact-email > a').text();
+            const contactEmail = $('#contactEmail > div.right.contact-email').html();
             const code = $('#product-detail > div.prd-more-info > div > div').text();
             const vipPostType = $('#ltrVipType').text();
-            // const postedAt = $('').text();
-            // const expiredAt = $('').text();
+            const postedAt = $('#product-detail > div.prd-more-info > div:nth-child(3)').text();
+            const expiredAt = $('#product-detail > div.prd-more-info > div:nth-child(4)').text();
 
-            const houseForRent = new HouseForRentModel({
+            const post = new PostModel({
                 title: title,
                 price: price,
                 area: area,
@@ -47,13 +47,13 @@ const detailCrawler = new Crawler({
                 contactEmail: contactEmail,
                 code: code,
                 vipPostType: vipPostType,
-                postedAt: "",
-                expiredAt: "",
+                postedAt: postedAt,
+                expiredAt: expiredAt,
                 slug: titleSlug
             });
             console.log(title);
 
-            HouseForRentModel.findOne({slug: titleSlug})
+            PostModel.findOne({slug: titleSlug})
                 .exec((err, duplicatedTitle) => {
                     if(err){
                         console.error(err);
@@ -64,7 +64,7 @@ const detailCrawler = new Crawler({
                         return;
                     }
 
-                    houseForRent.save(function (err) {
+                    post.save(function (err) {
                         if(err){
                             console.error(err);
                         }
@@ -97,7 +97,6 @@ const listCrawler = new Crawler({
 
 module.exports = () => {
   const pagePatern = 'https://batdongsan.com.vn/cho-thue-can-ho-chung-cu/p';
-
   //vì 1 page có 20 title nên chỉ cho chạy 5 page
   for(let i = 1; i<=5; i++){
       listCrawler.queue(pagePatern + i);
