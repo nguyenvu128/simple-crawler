@@ -7,7 +7,7 @@ const postSchema = new Schema({
     area: String,
     introduce: String,
     images: [String],
-    postTypes: String,
+    postType: String,
     address: String,
     bedrooms: String,
     toilets: String,

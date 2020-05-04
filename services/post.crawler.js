@@ -1,6 +1,7 @@
 const Crawler = require('crawler');
 const PostModel = require('../models/post.model');
 const slug = require('slug');
+const helper = require('./helper');
 
 const detailCrawler = new Crawler({
     rateLimit: 2000,
@@ -12,25 +13,28 @@ const detailCrawler = new Crawler({
             console.log(error);
         }else{
             const $ = res.$;
-            const title = $('#product-detail > div.pm-title > h1').text();
+            const title = helper.removeBreakLineCharacter($('#product-detail > div.pm-title > h1').text());
             const titleSlug = slug(title).toLowerCase();
-            const price = $('.kqchitiet > span > span.gia-title.mar-right-15 > strong').text();
-            const area = $('#product-detail span:nth-child(2) > strong').text();
-            const introduce = $('#product-detail > div.pm-content > div.pm-desc').text();
+            const price = helper.removeBreakLineCharacter($('.kqchitiet > span > span.gia-title.mar-right-15 > strong').text());
+            const area = helper.removeBreakLineCharacter($('#product-detail span:nth-child(2) > strong').text());
+            const introduce = helper.removeBreakLineCharacter($('#product-detail > div.pm-content > div.pm-desc').text());
             const images = $('#thumbs img').map((index, ele) => {
                 return ele.attribs.src;
             }).get();
-            const postType = $('#product-other-detail > div:nth-child(1) > div.right').text();
-            const address = $('#product-other-detail > div:nth-child(2) > div.right').text();
-            const bedrooms = $('#LeftMainContent__productDetail_roomNumber .right').text();
-            const toilets = $('#LeftMainContent__productDetail_toilet .right').text();
-            const contactName = $('.divContactName').text();
-            const contactAddress = $('#LeftMainContent__productDetail_contactAddress .right').text();
-            const contactEmail = $('#contactEmail > div.right.contact-email').html();
-            const code = $('#product-detail > div.prd-more-info > div > div').text();
+            const postType = helper.removeBreakLineCharacter($('#product-other-detail > div:nth-child(1) > div.right').text());
+            const address = helper.removeBreakLineCharacter($('#product-other-detail > div:nth-child(2) > div.right').text());
+            const bedrooms = helper.removeBreakLineCharacter($('#LeftMainContent__productDetail_roomNumber .right').text());
+            const toilets = helper.removeBreakLineCharacter($('#LeftMainContent__productDetail_toilet .right').text());
+            const contactName = helper.removeBreakLineCharacter($('.divContactName').text());
+            let contactAddress = $('#LeftMainContent__productDetail_contactAddress .right').text();
+            if(contactAddress === null) {
+                contactAddress = "";
+            }
+            const contactEmail = helper.removeBreakLineCharacter($('#contactEmail > div.right.contact-email').html());
+            const code = helper.removeBreakLineCharacter($('#product-detail > div.prd-more-info > div > div').text());
             const vipPostType = $('#ltrVipType').text();
-            const postedAt = $('#product-detail > div.prd-more-info > div:nth-child(3)').text();
-            const expiredAt = $('#product-detail > div.prd-more-info > div:nth-child(4)').text();
+            const postedAt = helper.removeBreakLineCharacter($('#product-detail > div.prd-more-info > div:nth-child(3)').text());
+            const expiredAt = helper.removeBreakLineCharacter($('#product-detail > div.prd-more-info > div:nth-child(4)').text());
 
             const post = new PostModel({
                 title: title,
@@ -38,7 +42,7 @@ const detailCrawler = new Crawler({
                 area: area,
                 introduce: introduce,
                 images: images,
-                postTypes: postType,
+                postType: postType,
                 address: address,
                 bedrooms: bedrooms,
                 toilets: toilets,
@@ -98,7 +102,7 @@ const listCrawler = new Crawler({
 module.exports = () => {
   const pagePatern = 'https://batdongsan.com.vn/cho-thue-can-ho-chung-cu/p';
   //vì 1 page có 20 title nên chỉ cho chạy 5 page
-  for(let i = 1; i<=5; i++){
+  for(let i = 1; i<=50; i++){
       listCrawler.queue(pagePatern + i);
   }
 };

@@ -1,6 +1,7 @@
 const Crawler = require("crawler");
 const ProjectModel = require('../models/project.model');
 const slug = require('slug');
+const helper = require('./helper');
 
 const detailCrawler = new Crawler({
     rateLimit: 2000,
@@ -12,13 +13,10 @@ const detailCrawler = new Crawler({
             console.log(error);
         }else{
             const $ = res.$;
-            // $ is Cheerio by default
-            //a lean implementation of core jQuery designed specifically for the server
-            const projectName = $('div.prj-right > div:nth-child(2) > div.fr').text();
+            const projectName = helper.removeBreakLineCharacter($('div.prj-right > div:nth-child(2) > div.fr').text());
             const projectSlug = slug(projectName).toLowerCase();
-            const address = $('div.prj-right > div:nth-child(3) > div.fr').text();
-
-            const introduce = $('div.prj-noidung.a1').text();
+            const address = helper.removeBreakLineCharacter($('div.prj-right > div:nth-child(3) > div.fr').text());
+            const introduce = helper.removeBreakLineCharacter($('div.prj-noidung.a1').text());
 
             const image = $('#imgslide img').map((index, ele) => {
                 return ele.attribs.src;
