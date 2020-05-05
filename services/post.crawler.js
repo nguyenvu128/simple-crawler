@@ -5,6 +5,11 @@ const helper = require('./helper');
 const POST_TYPES = require('../constant/post-type');
 const VIP_TYPES = require('../constant/vip-type');
 
+const convertStringToDate = (str) => {
+    const arrString = str.split('\r\n');
+    const newDate = arrString[1].split('-');
+    return new Date(newDate[2], newDate[1] - 1, newDate[0]);
+}
 const findVipType = (vipType) => {
     return VIP_TYPES[vipType];
 }
@@ -67,7 +72,9 @@ const detailCrawler = new Crawler({
             const code = helper.removeBreakLineCharacter($('#product-detail > div.prd-more-info > div > div').text());
             const vipPostType = findVipType($('#ltrVipType').text());
             const postedAt = helper.removeBreakLineCharacter($('#product-detail > div.prd-more-info > div:nth-child(3)').text());
+            const newPostedAt = convertStringToDate(postedAt);
             const expiredAt = helper.removeBreakLineCharacter($('#product-detail > div.prd-more-info > div:nth-child(4)').text());
+            const newExpiredAt = convertStringToDate(expiredAt);
 
             const post = new PostModel({
                 title: title,
@@ -85,8 +92,8 @@ const detailCrawler = new Crawler({
                 contactEmail: contactEmail,
                 code: code,
                 vipPostType: vipPostType,
-                postedAt: postedAt,
-                expiredAt: expiredAt,
+                postedAt: newPostedAt,
+                expiredAt: newExpiredAt,
                 slug: titleSlug
             });
             console.log(title);

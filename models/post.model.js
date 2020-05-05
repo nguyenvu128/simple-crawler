@@ -17,8 +17,8 @@ const postSchema = new Schema({
     contactEmail: String,
     code: String,
     vipPostType: Number,
-    postedAt: String,
-    expiredAt: String,
+    postedAt: Date,
+    expiredAt: Date,
     slug: String
 }, {timestamps: true});
 
