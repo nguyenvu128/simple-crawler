@@ -41,6 +41,7 @@ const detailCrawler = new Crawler({
                 .exec((err, duplicatedProject) => {
                     if(err){
                         console.error(err);
+                        return;
                     }
                     if(duplicatedProject){
                         console.log('Duplicated project name: ', projectName);
@@ -51,6 +52,7 @@ const detailCrawler = new Crawler({
                     project.save(function (err) {
                         if(err){
                             console.error(err);
+                            return;
                         }
                         done();
                     });

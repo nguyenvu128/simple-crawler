@@ -2,11 +2,18 @@ const Crawler = require('crawler');
 const PostModel = require('../models/post.model');
 const slug = require('slug');
 const helper = require('./helper');
+const POST_TYPES = require('../constant/post-type');
+const VIP_TYPES = require('../constant/vip-type');
 
+const findVipType = (vipType) => {
+    return VIP_TYPES[vipType];
+}
+const findPostTypeByTitle = (title) => {
+  return POST_TYPES.find(pt => pt.title = title);
+};
 const crawlPrice = (str) => {
     return str.split(" ");
 }
-
 const numberOfRooms = (numb) => {
     let newNumb = '';
     if(numb === ""){
@@ -44,6 +51,11 @@ const detailCrawler = new Crawler({
                 return ele.attribs.src;
             }).get();
             const postType = helper.removeBreakLineCharacter($('#product-other-detail > div:nth-child(1) > div.right').text());
+            const newPostType = findPostTypeByTitle(postType);
+            if(newPostType === undefined){
+                done();
+                return;
+            }
             const address = helper.removeBreakLineCharacter($('#product-other-detail > div:nth-child(2) > div.right').text());
             const bedrooms = helper.removeBreakLineCharacter($('#LeftMainContent__productDetail_roomNumber .right').text());
             const newBedrooms = numberOfRooms(bedrooms);
@@ -53,7 +65,7 @@ const detailCrawler = new Crawler({
             let contactAddress = $('#LeftMainContent__productDetail_contactAddress .right').text();
             const contactEmail = helper.removeBreakLineCharacter($('#contactEmail > div.right.contact-email').html());
             const code = helper.removeBreakLineCharacter($('#product-detail > div.prd-more-info > div > div').text());
-            const vipPostType = $('#ltrVipType').text();
+            const vipPostType = findVipType($('#ltrVipType').text());
             const postedAt = helper.removeBreakLineCharacter($('#product-detail > div.prd-more-info > div:nth-child(3)').text());
             const expiredAt = helper.removeBreakLineCharacter($('#product-detail > div.prd-more-info > div:nth-child(4)').text());
 
@@ -64,7 +76,7 @@ const detailCrawler = new Crawler({
                 area: area,
                 introduce: introduce,
                 images: images,
-                postType: postType,
+                postType: newPostType.id,
                 address: address,
                 bedrooms: newBedrooms,
                 toilets: newToilets,
@@ -83,6 +95,7 @@ const detailCrawler = new Crawler({
                 .exec((err, duplicatedTitle) => {
                     if(err){
                         console.error(err);
+                        return;
                     }
                     if(duplicatedTitle){
                         console.log('Duplicated title for rent: ', title);
@@ -93,6 +106,7 @@ const detailCrawler = new Crawler({
                     post.save(function (err) {
                         if(err){
                             console.error(err);
+                            return;
                         }
                         done();
                     });
@@ -122,8 +136,10 @@ const listCrawler = new Crawler({
 });
 
 module.exports = () => {
-  const pagePatern = 'https://batdongsan.com.vn/cho-thue-can-ho-chung-cu/p';
-  for(let i = 1; i<=50; i++){
-      listCrawler.queue(pagePatern + i);
-  }
+  POST_TYPES.forEach( pt => {
+      for(let i = 1; i<=50; i++){
+          listCrawler.queue(pt.link + i);
+      }
+  });
+
 };
