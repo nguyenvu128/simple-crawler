@@ -7,6 +7,15 @@ const crawlPrice = (str) => {
     return str.split(" ");
 }
 
+const numberOfRooms = (numb) => {
+    let newNumb = '';
+    if(numb === ""){
+        newNumb = -1
+    }else {
+        newNumb = parseInt(numb);
+    }
+    return newNumb;
+}
 const detailCrawler = new Crawler({
     rateLimit: 2000,
     maxConnections : 1,
@@ -37,10 +46,11 @@ const detailCrawler = new Crawler({
             const postType = helper.removeBreakLineCharacter($('#product-other-detail > div:nth-child(1) > div.right').text());
             const address = helper.removeBreakLineCharacter($('#product-other-detail > div:nth-child(2) > div.right').text());
             const bedrooms = helper.removeBreakLineCharacter($('#LeftMainContent__productDetail_roomNumber .right').text());
+            const newBedrooms = numberOfRooms(bedrooms);
             const toilets = helper.removeBreakLineCharacter($('#LeftMainContent__productDetail_toilet .right').text());
+            const newToilets = numberOfRooms(toilets);
             const contactName = helper.removeBreakLineCharacter($('.divContactName').text());
             let contactAddress = $('#LeftMainContent__productDetail_contactAddress .right').text();
-
             const contactEmail = helper.removeBreakLineCharacter($('#contactEmail > div.right.contact-email').html());
             const code = helper.removeBreakLineCharacter($('#product-detail > div.prd-more-info > div > div').text());
             const vipPostType = $('#ltrVipType').text();
@@ -56,8 +66,8 @@ const detailCrawler = new Crawler({
                 images: images,
                 postType: postType,
                 address: address,
-                bedrooms: bedrooms,
-                toilets: toilets,
+                bedrooms: newBedrooms,
+                toilets: newToilets,
                 contactName: contactName,
                 contactAddress: contactAddress,
                 contactEmail: contactEmail,
