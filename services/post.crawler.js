@@ -4,21 +4,27 @@ const slug = require('slug');
 const helper = require('./helper');
 const POST_TYPES = require('../constant/post-type');
 const VIP_TYPES = require('../constant/vip-type');
+const Entities = require('html-entities').XmlEntities;
+const entities = new Entities()
 
+const decodeStringToEmail = (encodeStr) => {
+    const regex = /\'\>.*\<\/a\>/;
+    return entities.decode(encodeStr.match(regex)[0].slice(2, -4));
+};
 const convertStringToDate = (str) => {
     const arrString = str.split('\r\n');
     const newDate = arrString[1].split('-');
     return new Date(newDate[2], newDate[1] - 1, newDate[0]);
-}
+};
 const findVipType = (vipType) => {
     return VIP_TYPES[vipType];
-}
+};
 const findPostTypeByTitle = (title) => {
   return POST_TYPES.find(pt => pt.title = title);
 };
 const crawlPrice = (str) => {
     return str.split(" ");
-}
+};
 const numberOfRooms = (numb) => {
     let newNumb = '';
     if(numb === ""){
@@ -27,7 +33,7 @@ const numberOfRooms = (numb) => {
         newNumb = parseInt(numb);
     }
     return newNumb;
-}
+};
 const detailCrawler = new Crawler({
     rateLimit: 2000,
     maxConnections : 1,
@@ -67,8 +73,15 @@ const detailCrawler = new Crawler({
             const toilets = helper.removeBreakLineCharacter($('#LeftMainContent__productDetail_toilet .right').text());
             const newToilets = numberOfRooms(toilets);
             const contactName = helper.removeBreakLineCharacter($('.divContactName').text());
-            let contactAddress = $('#LeftMainContent__productDetail_contactAddress .right').text();
+            const contactAddress = $('#LeftMainContent__productDetail_contactAddress .right').text();
             const contactEmail = helper.removeBreakLineCharacter($('#contactEmail > div.right.contact-email').html());
+            var emailAfterDecoded;
+            if(contactEmail === undefined){
+                emailAfterDecoded = ''
+            }else {
+                emailAfterDecoded = decodeStringToEmail(contactEmail);
+            }
+
             const code = helper.removeBreakLineCharacter($('#product-detail > div.prd-more-info > div > div').text());
             const vipPostType = findVipType($('#ltrVipType').text());
             const postedAt = helper.removeBreakLineCharacter($('#product-detail > div.prd-more-info > div:nth-child(3)').text());
@@ -89,7 +102,7 @@ const detailCrawler = new Crawler({
                 toilets: newToilets,
                 contactName: contactName,
                 contactAddress: contactAddress,
-                contactEmail: contactEmail,
+                contactEmail: emailAfterDecoded,
                 code: code,
                 vipPostType: vipPostType,
                 postedAt: newPostedAt,
