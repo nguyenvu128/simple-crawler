@@ -73,11 +73,11 @@ const detailCrawler = new Crawler({
             const toilets = helper.removeBreakLineCharacter($('#LeftMainContent__productDetail_toilet .right').text());
             const newToilets = numberOfRooms(toilets);
             const contactName = helper.removeBreakLineCharacter($('.divContactName').text());
-            const contactAddress = $('#LeftMainContent__productDetail_contactAddress .right').text();
+            const contactAddress = helper.removeBreakLineCharacter($('#LeftMainContent__productDetail_contactAddress .right').text());
             const contactEmail = helper.removeBreakLineCharacter($('#contactEmail > div.right.contact-email').html());
-            var emailAfterDecoded;
-            if(contactEmail === undefined){
-                emailAfterDecoded = ''
+            let emailAfterDecoded;
+            if(contactEmail === ''){
+                emailAfterDecoded = '';
             }else {
                 emailAfterDecoded = decodeStringToEmail(contactEmail);
             }

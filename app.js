@@ -5,5 +5,5 @@ const crawlerPost = require('./services/post.crawler');
 connectDatabase(() => {
     // Queue just one URL, with default callback
     crawlerPost();
-    // crawlerProject();
+    crawlerProject();
 });
