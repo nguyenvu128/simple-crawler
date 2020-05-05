@@ -3,6 +3,10 @@ const PostModel = require('../models/post.model');
 const slug = require('slug');
 const helper = require('./helper');
 
+const crawlPrice = (str) => {
+    return str.split(" ");
+}
+
 const detailCrawler = new Crawler({
     rateLimit: 2000,
     maxConnections : 1,
@@ -16,6 +20,15 @@ const detailCrawler = new Crawler({
             const title = helper.removeBreakLineCharacter($('#product-detail > div.pm-title > h1').text());
             const titleSlug = slug(title).toLowerCase();
             const price = helper.removeBreakLineCharacter($('.kqchitiet > span > span.gia-title.mar-right-15 > strong').text());
+
+            let newPrice = [];
+            if(price == null || price === 'Thỏa thuận'){
+                newPrice.push(-1);
+                newPrice.push('');
+            }else {
+                 newPrice = crawlPrice(price);
+            }
+
             const area = helper.removeBreakLineCharacter($('#product-detail span:nth-child(2) > strong').text());
             const introduce = helper.removeBreakLineCharacter($('#product-detail > div.pm-content > div.pm-desc').text());
             const images = $('#thumbs img').map((index, ele) => {
@@ -27,9 +40,7 @@ const detailCrawler = new Crawler({
             const toilets = helper.removeBreakLineCharacter($('#LeftMainContent__productDetail_toilet .right').text());
             const contactName = helper.removeBreakLineCharacter($('.divContactName').text());
             let contactAddress = $('#LeftMainContent__productDetail_contactAddress .right').text();
-            if(contactAddress === null) {
-                contactAddress = "";
-            }
+
             const contactEmail = helper.removeBreakLineCharacter($('#contactEmail > div.right.contact-email').html());
             const code = helper.removeBreakLineCharacter($('#product-detail > div.prd-more-info > div > div').text());
             const vipPostType = $('#ltrVipType').text();
@@ -38,7 +49,8 @@ const detailCrawler = new Crawler({
 
             const post = new PostModel({
                 title: title,
-                price: price,
+                price: newPrice[0],
+                unit: newPrice[1],
                 area: area,
                 introduce: introduce,
                 images: images,
@@ -101,7 +113,6 @@ const listCrawler = new Crawler({
 
 module.exports = () => {
   const pagePatern = 'https://batdongsan.com.vn/cho-thue-can-ho-chung-cu/p';
-  //vì 1 page có 20 title nên chỉ cho chạy 5 page
   for(let i = 1; i<=50; i++){
       listCrawler.queue(pagePatern + i);
   }

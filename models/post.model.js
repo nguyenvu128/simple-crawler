@@ -3,7 +3,8 @@ const Schema = mongoose.Schema;
 const ObjectId = mongoose.Schema.Types.ObjectId;
 const postSchema = new Schema({
     title: String,
-    price: String,
+    price: Number,
+    unit: String,
     area: String,
     introduce: String,
     images: [String],
