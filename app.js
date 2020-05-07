@@ -4,9 +4,11 @@ const connectDatabase = require('./database/database');
 const crawlerProject = require('./services/project.crawler');
 const crawlerPost = require('./services/post.crawler');
 
-schedule.scheduleJob('17 * * * *', connectDatabase(() => {
-    // Queue just one URL, with default callbackadd
-    crawlerPost();
-    crawlerProject();
-}));
+connectDatabase(() => {
+    schedule.scheduleJob('17 * * *', () => {
+        console.log('Job: ', new Date());
+        crawlerPost();
+        crawlerProject();
+    });
+});
 
