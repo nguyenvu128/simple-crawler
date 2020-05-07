@@ -5,7 +5,8 @@ const helper = require('./helper');
 const POST_TYPES = require('../constant/post-type');
 const VIP_TYPES = require('../constant/vip-type');
 const Entities = require('html-entities').XmlEntities;
-const entities = new Entities()
+const entities = new Entities();
+require('dotenv').config();
 
 const decodeStringToEmail = (encodeStr) => {
     const regex = /\'\>.*\<\/a\>/;
@@ -156,10 +157,10 @@ const listCrawler = new Crawler({
 });
 
 module.exports = () => {
+    const pages = parseInt(process.env.crawler_post_page);
   POST_TYPES.forEach( pt => {
-      for(let i = 1; i<=50; i++){
+      for(let i = 1; i <= pages; i++){
           listCrawler.queue(pt.link + i);
       }
   });
-
 };

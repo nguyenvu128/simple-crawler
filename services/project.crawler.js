@@ -2,6 +2,7 @@ const Crawler = require("crawler");
 const ProjectModel = require('../models/project.model');
 const slug = require('slug');
 const helper = require('./helper');
+require('dotenv').config();
 
 const detailCrawler = new Crawler({
     rateLimit: 2000,
@@ -81,7 +82,8 @@ const listCrawler = new Crawler({
 });
 module.exports = () => {
     const pagePatern = 'https://batdongsan.com.vn/can-ho-chung-cu/p';
-    for(let i = 1; i<=10; i++) {
+    const pages = parseInt(process.env.crawler_project_page);
+    for(let i = 1; i <= pages; i++) {
         listCrawler.queue(pagePatern + i);
     }
 }
