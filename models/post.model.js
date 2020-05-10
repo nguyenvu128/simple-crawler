@@ -10,6 +10,8 @@ const postSchema = new Schema({
     images: [String],
     postType: String,
     address: String,
+    projectName: String,
+    projectId: ObjectId,
     bedrooms: Number,
     toilets: Number,
     contactName: String,

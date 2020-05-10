@@ -1,5 +1,6 @@
 const Crawler = require('crawler');
 const PostModel = require('../models/post.model');
+const ProjectModel = require('../models/project.model');
 const slug = require('slug');
 const helper = require('./helper');
 const POST_TYPES = require('../constant/post-type');
@@ -40,7 +41,7 @@ const detailCrawler = new Crawler({
     maxConnections : 1,
     userAgent: "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36",
     // This will be called for each crawled page
-    callback : function (error, res, done) {
+    callback : async function (error, res, done) {
         if(error){
             console.log(error);
         }else{
@@ -73,16 +74,19 @@ const detailCrawler = new Crawler({
             const newBedrooms = numberOfRooms(bedrooms);
             const toilets = helper.removeBreakLineCharacter($('#LeftMainContent__productDetail_toilet .right').text());
             const newToilets = numberOfRooms(toilets);
+            const projectName = helper.removeBreakLineCharacter($('#project > div.table-detail > div:nth-child(1) > div.right').text());
             const contactName = helper.removeBreakLineCharacter($('.divContactName').text());
             const contactAddress = helper.removeBreakLineCharacter($('#LeftMainContent__productDetail_contactAddress .right').text());
             const contactEmail = helper.removeBreakLineCharacter($('#contactEmail > div.right.contact-email').html());
+            const detailProject = $('#LeftMainContent__productDetail_linkProject').map((index, ele) => {
+                return ele.attribs.href;
+            });
             let emailAfterDecoded;
             if(contactEmail === ''){
                 emailAfterDecoded = '';
             }else {
                 emailAfterDecoded = decodeStringToEmail(contactEmail);
             }
-
             const code = helper.removeBreakLineCharacter($('#product-detail > div.prd-more-info > div > div').text());
             const vipPostType = findVipType($('#ltrVipType').text());
             const postedAt = helper.removeBreakLineCharacter($('#product-detail > div.prd-more-info > div:nth-child(3)').text());
@@ -90,7 +94,7 @@ const detailCrawler = new Crawler({
             const expiredAt = helper.removeBreakLineCharacter($('#product-detail > div.prd-more-info > div:nth-child(4)').text());
             const newExpiredAt = convertStringToDate(expiredAt);
 
-            const post = new PostModel({
+            const postData = {
                 title: title,
                 price: newPrice[0],
                 unit: newPrice[1],
@@ -99,6 +103,8 @@ const detailCrawler = new Crawler({
                 images: images,
                 postType: newPostType.id,
                 address: address,
+                projectName: projectName,
+                projectId: '',
                 bedrooms: newBedrooms,
                 toilets: newToilets,
                 contactName: contactName,
@@ -109,29 +115,28 @@ const detailCrawler = new Crawler({
                 postedAt: newPostedAt,
                 expiredAt: newExpiredAt,
                 slug: titleSlug
-            });
+            };
             console.log(title);
-
-            PostModel.findOne({slug: titleSlug})
-                .exec((err, duplicatedTitle) => {
-                    if(err){
-                        console.error(err);
-                        return;
-                    }
-                    if(duplicatedTitle){
-                        console.log('Duplicated title for rent: ', title);
-                        done();
-                        return;
-                    }
-
-                    post.save(function (err) {
-                        if(err){
-                            console.error(err);
-                            return;
-                        }
-                        done();
-                    });
-                })
+            try{
+                const duplicatedTitle = await PostModel.findOne({slug: titleSlug}).exec();
+                if(duplicatedTitle) {
+                    // throw new Error('Duplicated title for rent: ' + title);
+                    console.log('Duplicated title for rent: ', title);
+                }
+                const findProject = await ProjectModel.findOne({url: detailProject}).exec();
+                if(!findProject){
+                    postData.projectId = null;
+                }else {
+                    postData.projectId = findProject._id;
+                }
+                console.log('project id : ', findProject);
+                const postModel = new PostModel(postData);
+                await postModel.save();
+            }catch (err){
+                console.error(err);
+            }finally {
+                done();
+            }
         }
     }
 });

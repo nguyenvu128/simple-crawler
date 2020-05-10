@@ -4,6 +4,7 @@ const slug = require('slug');
 const helper = require('./helper');
 require('dotenv').config();
 
+
 const detailCrawler = new Crawler({
     rateLimit: 2000,
     maxConnections : 1,
@@ -18,7 +19,7 @@ const detailCrawler = new Crawler({
             const projectSlug = slug(projectName).toLowerCase();
             const address = helper.removeBreakLineCharacter($('div.prj-right > div:nth-child(3) > div.fr').text());
             const introduce = helper.removeBreakLineCharacter($('div.prj-noidung.a1').text());
-
+            const url = '/' + res.options.uri.split('/').pop();
             const image = $('#imgslide img').map((index, ele) => {
                 return ele.attribs.src;
             }).get();
@@ -32,6 +33,7 @@ const detailCrawler = new Crawler({
                 name: projectName,
                 address: address,
                 introduce: introduce,
+                url: url,
                 image: image,
                 //gallery: gallery,
                 slug: projectSlug
