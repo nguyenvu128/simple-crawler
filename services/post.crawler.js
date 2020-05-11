@@ -49,7 +49,7 @@ const detailCrawler = new Crawler({
             const title = helper.removeBreakLineCharacter($('#product-detail > div.pm-title > h1').text());
             const titleSlug = slug(title).toLowerCase();
             const price = helper.removeBreakLineCharacter($('.kqchitiet > span > span.gia-title.mar-right-15 > strong').text());
-
+            const url = res.options.uri;
             let newPrice = [];
             if(price == null || price === 'Thỏa thuận'){
                 newPrice.push(-1);
@@ -93,16 +93,25 @@ const detailCrawler = new Crawler({
             const newPostedAt = convertStringToDate(postedAt);
             const expiredAt = helper.removeBreakLineCharacter($('#product-detail > div.prd-more-info > div:nth-child(4)').text());
             const newExpiredAt = convertStringToDate(expiredAt);
+            const city = $('#divCity li.current').text();
+            const district = $('#divDistrict li.current').text();
+            const ward = $('#divWard li.current').text();
+            const street = $('#divStreet li.current').text();
 
             const postData = {
                 title: title,
                 price: newPrice[0],
                 unit: newPrice[1],
                 area: area,
+                url: url,
                 introduce: introduce,
                 images: images,
                 postType: newPostType.id,
                 address: address,
+                city: city,
+                district: district,
+                ward: ward,
+                street: street,
                 projectName: projectName,
                 projectId: '',
                 bedrooms: newBedrooms,
@@ -129,7 +138,6 @@ const detailCrawler = new Crawler({
                 }else {
                     postData.projectId = findProject._id;
                 }
-                console.log('project id : ', findProject);
                 const postModel = new PostModel(postData);
                 await postModel.save();
             }catch (err){
