@@ -59,6 +59,14 @@ const detailCrawler = new Crawler({
             }
 
             const area = helper.removeBreakLineCharacter($('#product-detail span:nth-child(2) > strong').text());
+            const newArea = [];
+            if(area === null || area ==='Không xác định'){
+                newArea.push(-1);
+                newArea.push('Không xác định');
+            }else {
+                newArea.push(area.slice(0, -2));
+                newArea.push(area.slice(-2));
+            }
             const introduce = helper.removeBreakLineCharacter($('#product-detail > div.pm-content > div.pm-desc').text());
             const images = $('#thumbs img').map((index, ele) => {
                 return ele.attribs.src;
@@ -76,11 +84,19 @@ const detailCrawler = new Crawler({
             const newToilets = numberOfRooms(toilets);
             const projectName = helper.removeBreakLineCharacter($('#project > div.table-detail > div:nth-child(1) > div.right').text());
             const contactName = helper.removeBreakLineCharacter($('.divContactName').text());
+            const contactPhone = helper.removeBreakLineCharacter($('#LeftMainContent__productDetail_contactMobile > div.right.contact-phone').text());
+            let newContactPhone;
+            if(contactPhone === ''){
+                newContactPhone = '';
+            }else {
+                newContactPhone = contactPhone;
+            }
             const contactAddress = helper.removeBreakLineCharacter($('#LeftMainContent__productDetail_contactAddress .right').text());
             const contactEmail = helper.removeBreakLineCharacter($('#contactEmail > div.right.contact-email').html());
             const detailProject = $('#LeftMainContent__productDetail_linkProject').map((index, ele) => {
                 return ele.attribs.href;
-            });
+            }).get();
+
             let emailAfterDecoded;
             if(contactEmail === ''){
                 emailAfterDecoded = '';
@@ -101,8 +117,9 @@ const detailCrawler = new Crawler({
             const postData = {
                 title: title,
                 price: newPrice[0],
-                unit: newPrice[1],
-                area: area,
+                priceUnit: newPrice[1],
+                area: newArea[0],
+                areaUnit: newArea[1],
                 url: url,
                 introduce: introduce,
                 images: images,
@@ -118,6 +135,7 @@ const detailCrawler = new Crawler({
                 toilets: newToilets,
                 contactName: contactName,
                 contactAddress: contactAddress,
+                contactPhone: newContactPhone,
                 contactEmail: emailAfterDecoded,
                 code: code,
                 vipPostType: vipPostType,
@@ -129,10 +147,9 @@ const detailCrawler = new Crawler({
             try{
                 const duplicatedTitle = await PostModel.findOne({slug: titleSlug}).exec();
                 if(duplicatedTitle) {
-                    // throw new Error('Duplicated title for rent: ' + title);
-                    console.log('Duplicated title for rent: ', title);
+                    throw new Error('Duplicated title for rent: ' + title);
                 }
-                const findProject = await ProjectModel.findOne({url: detailProject}).exec();
+                const findProject = await ProjectModel.findOne({url: detailProject[0]}).exec();
                 if(!findProject){
                     postData.projectId = null;
                 }else {
