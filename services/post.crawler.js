@@ -82,15 +82,9 @@ const detailCrawler = new Crawler({
             const newBedrooms = numberOfRooms(bedrooms);
             const toilets = helper.removeBreakLineCharacter($('#LeftMainContent__productDetail_toilet .right').text());
             const newToilets = numberOfRooms(toilets);
-            const projectName = helper.removeBreakLineCharacter($('#project > div.table-detail > div:nth-child(1) > div.right').text());
+            const projectName = helper.removeBreakLineCharacter($('#project > div.table-detail > div:nth-child(1) > div.right').text()) ;
             const contactName = helper.removeBreakLineCharacter($('.divContactName').text());
-            const contactPhone = helper.removeBreakLineCharacter($('#LeftMainContent__productDetail_contactMobile > div.right.contact-phone').text());
-            let newContactPhone;
-            if(contactPhone === ''){
-                newContactPhone = '';
-            }else {
-                newContactPhone = contactPhone;
-            }
+            const contactPhone = helper.removeBreakLineCharacter($('#LeftMainContent__productDetail_contactMobile > div.right.contact-phone').text()) || ''; // string || null;
             const contactAddress = helper.removeBreakLineCharacter($('#LeftMainContent__productDetail_contactAddress .right').text());
             const contactEmail = helper.removeBreakLineCharacter($('#contactEmail > div.right.contact-email').html());
             const detailProject = $('#LeftMainContent__productDetail_linkProject').map((index, ele) => {
@@ -135,7 +129,7 @@ const detailCrawler = new Crawler({
                 toilets: newToilets,
                 contactName: contactName,
                 contactAddress: contactAddress,
-                contactPhone: newContactPhone,
+                contactPhone: contactPhone,
                 contactEmail: emailAfterDecoded,
                 code: code,
                 vipPostType: vipPostType,
