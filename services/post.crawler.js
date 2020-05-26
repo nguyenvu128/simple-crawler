@@ -22,7 +22,7 @@ const findVipType = (vipType) => {
     return VIP_TYPES[vipType];
 };
 const findPostTypeByTitle = (title) => {
-  return POST_TYPES.find(pt => pt.title = title);
+  return POST_TYPES.find(pt => pt.title === title);
 };
 const crawlPrice = (str) => {
     return str.split(" ");

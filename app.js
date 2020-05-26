@@ -8,8 +8,8 @@ const findProject = require('./services/findAndUpdateProject');
 connectDatabase(() => {
     if(process.env.dev === 'true'){
         crawlerPost();
-        crawlerProject();
-        findProject();
+        // crawlerProject();
+        // findProject();
     }else {
         schedule.scheduleJob(process.env.cron_jobs_start_at, function(){
             // Queue just one URL, with default callbackadd
